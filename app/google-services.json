@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "60981200147",
+    "firebase_url": "https://keep-d60e7.firebaseio.com",
+    "project_id": "keep-d60e7",
+    "storage_bucket": "keep-d60e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60981200147:android:b7d8807d17594b17",
+        "android_client_info": {
+          "package_name": "com.irondigitalmedia.keep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "60981200147-thorp043ugvbi8q4a4dmb059hru7eoso.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.irondigitalmedia.keep",
+            "certificate_hash": "14f38c361fa95cdc8ceed86ec25df3a8880f57a2"
+          }
+        },
+        {
+          "client_id": "60981200147-5q7jqfo3aoca9iiage3jv81mknmrjmmd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsAtfHmFYKOTKg5t1tykuhbjFMN15xUhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "60981200147-5q7jqfo3aoca9iiage3jv81mknmrjmmd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
