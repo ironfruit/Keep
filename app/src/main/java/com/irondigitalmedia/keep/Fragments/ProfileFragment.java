@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -36,6 +37,7 @@ import com.google.firebase.storage.StorageReference;
 import com.irondigitalmedia.keep.Adapters.ProfileRecipeAdapter;
 import com.irondigitalmedia.keep.Authentication.Login;
 import com.irondigitalmedia.keep.EditProfile;
+import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.Model.User;
 import com.irondigitalmedia.keep.R;
@@ -88,6 +90,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Recipe mRecipe;
     private View view;
 
+    private MainActivity mainActivity;
+    private Toolbar toolbar;
+
     // Boolean
     private boolean UserAvailable = false;
 
@@ -104,6 +109,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // Create View and inflate it
         view = inflater.inflate(R.layout.fragment_profile, container, false);
         mContext = view.getContext();
+
+        mainActivity = (MainActivity) view.getContext();
+        mainActivity.mMainNav.setSelectedItemId(R.id.nav_profile);
+
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.profile);
         // inside your activity (if you did not enable transitions in your theme)
 
 

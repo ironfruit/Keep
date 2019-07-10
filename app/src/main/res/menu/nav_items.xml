@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_random"
         android:title="Random"/>
     <item
-        android:id="@+id/nav_add_recipe"
+        android:id="@+id/nav_edit_recipe"
         android:icon="@drawable/ic_add_circle"
         android:title="@string/nav_item_add" />
     <item

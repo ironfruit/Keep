@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -87,9 +88,9 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddNewRecipeFrag extends BaseFragment implements View.OnClickListener {
+public class EditRecipe extends BaseFragment implements View.OnClickListener {
 
-    private static final String TAG = AddNewRecipeFrag.class.getSimpleName();
+    private static final String TAG = EditRecipe.class.getSimpleName();
 
 
     // Views
@@ -147,8 +148,9 @@ public class AddNewRecipeFrag extends BaseFragment implements View.OnClickListen
     private Context mContext = getContext();
 
     private MainActivity mainActivity;
+    private Toolbar toolbar;
 
-    public AddNewRecipeFrag() {
+    public EditRecipe() {
         // Required empty public constructor
     }
 
@@ -163,6 +165,11 @@ public class AddNewRecipeFrag extends BaseFragment implements View.OnClickListen
         getActivity().setTitle("Edit Recipe");
         setHasOptionsMenu(true);
         mainActivity = (MainActivity) view.getContext();
+        mainActivity.mMainNav.setSelectedItemId(R.id.nav_edit_recipe);
+
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.edit_recipe);
 
         InitializeFirebaseCloud();
 

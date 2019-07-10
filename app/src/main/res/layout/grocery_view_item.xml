@@ -16,6 +16,7 @@
 
     <ImageView
         android:id="@+id/grocery_dialog_viewItem_image"
+        android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         app:srcCompat="@drawable/ic_person" />

@@ -22,13 +22,29 @@
             android:id="@+id/main_progressBar"/>
     </RelativeLayout>
 
-    <FrameLayout
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            app:titleTextColor="@color/colorWhite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme" />
+
+        <FrameLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"/>
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="56dp" />
 
-
+    </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/main_nav"
@@ -43,6 +59,8 @@
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/nav_items"
         app:itemTextAppearanceActive="@style/TextAppearance.AppCompat.Medium"/>
+
+
 
 
 </FrameLayout>

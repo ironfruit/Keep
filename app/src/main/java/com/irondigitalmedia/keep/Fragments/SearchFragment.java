@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,7 +25,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.irondigitalmedia.keep.Adapters.SearchAdapter;
 import com.irondigitalmedia.keep.BaseActivity;
 import com.irondigitalmedia.keep.MainActivity;
-import com.irondigitalmedia.keep.Model.Instruction;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;
@@ -49,6 +49,7 @@ public class SearchFragment extends Fragment {
     private MainActivity mainActivity;
     private BaseActivity baseActivity;
     private String dataSnapShotKey;
+    private Toolbar toolbar;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -58,9 +59,11 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search,container,false);
+
         mContext = view.getContext();
         mRecipeList = new ArrayList<>();
         mRecipeIds = new ArrayList<>();
+
         SearchRecyclerView = view.findViewById(R.id.frag_search_rv);
         SearchRecyclerView.setItemAnimator(new DefaultItemAnimator());
         LLM = new LinearLayoutManager(getContext());
@@ -68,12 +71,16 @@ public class SearchFragment extends Fragment {
         SearchRecyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new SearchAdapter(mContext, mRecipeList);
         SearchRecyclerView.setAdapter(adapter);
+
         mainActivity = (MainActivity) view.getContext();
         mainActivity.mMainNav.setSelectedItemId(R.id.nav_search);
-        database = FirebaseDatabase.getInstance();
+
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+
+                database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
-        mRecipeList.clear();
-        mRecipeIds.clear();
+
         myRef.child(Constants.DATABASE_ROOT_RECIPES).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {

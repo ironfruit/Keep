@@ -16,13 +16,13 @@ import com.irondigitalmedia.keep.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RandomRecipeFragment extends Fragment {
+public class GroceryDetials extends Fragment {
 
     private MainActivity mainActivity;
     private Toolbar toolbar;
 
 
-    public RandomRecipeFragment() {
+    public GroceryDetials() {
         // Required empty public constructor
     }
 
@@ -30,15 +30,16 @@ public class RandomRecipeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_random_recipe, container, false);
+        View view = inflater.inflate(R.layout.fragment_grocery_detials, container, false);
+
 
         mainActivity = (MainActivity) view.getContext();
-        mainActivity.mMainNav.setSelectedItemId(R.id.nav_random);
 
         toolbar = mainActivity.findViewById(R.id.main_toolbar);
         mainActivity.setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.app_name);
 
+        // Inflate the layout for this fragment
         return view;
     }
 

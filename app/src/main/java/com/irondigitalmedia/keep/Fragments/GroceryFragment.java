@@ -14,6 +14,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -49,6 +50,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.irondigitalmedia.keep.Adapters.GroceryAdapter;
+import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Grocery;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.R;
@@ -114,6 +116,9 @@ public class GroceryFragment extends Fragment implements View.OnClickListener{
 
     private String mCurrentPhotoPath;
 
+    private MainActivity mainActivity;
+    private Toolbar toolbar;
+
 
     public GroceryFragment() {
         // Required empty public constructor
@@ -124,6 +129,13 @@ public class GroceryFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_grocery, container, false);
+
+        mainActivity = (MainActivity) view.getContext();
+        mainActivity.mMainNav.setSelectedItemId(R.id.nav_grocery);
+
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+        toolbar.setTitle("Grocery Items");
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         getActivity().setTitle("Grocery Items");

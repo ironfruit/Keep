@@ -12,6 +12,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -49,6 +50,7 @@ import com.irondigitalmedia.keep.Adapters.EditIngredientAdapter;
 import com.irondigitalmedia.keep.Adapters.EditStepsAdapter;
 import com.irondigitalmedia.keep.Adapters.IngredientsAdapter;
 import com.irondigitalmedia.keep.Adapters.StepsAdapter;
+import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Ingredient;
 import com.irondigitalmedia.keep.Model.Instruction;
 import com.irondigitalmedia.keep.Model.Recipe;
@@ -91,7 +93,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
 
     private ShareActionProvider shareActionProvider;
     private TextView mRecipeTitle, mRecipeCreator, mRecipeDesc,mRecipePrepTime, mUsername;
-    private ToggleButton mFollowUserButton;
     private Recipe mRecipe;
     public String mRecipeKey, mRecipeCreatorId;
     private Bundle info;
@@ -112,6 +113,9 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     // Views
     protected int num;
 
+    private MainActivity mainActivity;
+    private Toolbar toolbar;
+
 
     public RecipeDetailsFragment() {
         // Required empty public constructor
@@ -123,6 +127,12 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_details, container, false);
+
+        mainActivity = (MainActivity) view.getContext();
+
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+
         setHasOptionsMenu(true);
         InitiateViewsAndAdapters(view);
         RecieveRecipeKey();
@@ -132,8 +142,21 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         return view;
     }
 
+    public String RecieveRecipeKey(){
+        Log.i(TAG, "RecieveRecipeKey: =======================================RECEIVING RECIPE KEY BEGIN================================================== ");
+        Bundle bundle = getArguments();
+        if(bundle!=null){
+            String key = bundle.getString(Constants.EXTRA_RECIPE_KEY);
+            if(key!=null){
+                mRecipeKey = key;
+                Log.i(TAG, "RecieveRecipeKey: Recipe Key = " + mRecipeKey);
+            }
+        }
+        Log.i(TAG, "RecieveRecipeKey: =======================================RECEIVING RECIPE KEY END================================================== ");
+        return mRecipeKey;
+    }
+
     private void UpdateDetails() {
-        Log.i(TAG, "UpdateDetails: getting recipe details. RecipeKey is " + mRecipeKey);
         mRecipeRef = FirebaseDatabase.getInstance().getReference();
         mUserRef = FirebaseDatabase.getInstance().getReference();
         mIngredientDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -143,76 +166,55 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         // Retrieve the recipe details (not the ingredients or instructions just yet)
         mRecipeRef.child(Constants.DATABASE_ROOT_RECIPES).child(mRecipeKey)
                 .addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mRecipe = dataSnapshot.getValue(Recipe.class);
-                if(mRecipe!=null){
-                    getActivity().setTitle(mRecipe.title);
-                    mRecipeDesc.setText(mRecipe.desc);
-                    mRecipePrepTime.setText(mRecipe.prepTime);
-                    Glide.with(getContext()).load(mRecipe.url).into(mRecipePhoto);
-                    mRecipeCreatorId = mRecipe.creatorId;
-                    if(mRecipeCreatorId.equalsIgnoreCase(getUid())){
-                        if(menu!=null){
-                            menu.findItem(R.id.delete).setVisible(true);
-                        }
-                    }else{
-                        Log.i(TAG, "onDataChange: User did not create this recipe.");
-                    }
-                    Log.i(TAG, "onDataChange: Recipe Creator Id = " + mRecipeCreatorId);
-                    Log.i(TAG, "UpdateDetails: Creator Id = " + mRecipeCreatorId);
-                    mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING)
-                            .child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.hasChild(mRecipeCreatorId)){
-                                mFollowUserButton.setChecked(true);
-                                Log.i(TAG, "onDataChange: Following User at " + mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(mAuth.getCurrentUser().getUid()).child(mRecipeCreatorId));
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        mRecipe = dataSnapshot.getValue(Recipe.class);
+                        if(mRecipe!=null){
+                            getActivity().setTitle(mRecipe.title);
+                            mRecipeDesc.setText(mRecipe.desc);
+                            mRecipePrepTime.setText(mRecipe.prepTime);
+                            Glide.with(getContext()).load(mRecipe.url).into(mRecipePhoto);
+                            mRecipeCreatorId = mRecipe.creatorId;
+                            if(mRecipeCreatorId.equalsIgnoreCase(getUid())){
+                                if(menu!=null){
+                                    menu.findItem(R.id.delete).setVisible(true);
+                                }
                             }else{
-                                Log.i(TAG, "onDataChange: Not following user...");
-                                mFollowUserButton.setChecked(false);
+                                Log.i(TAG, "onDataChange: User did not create this recipe.");
                             }
+                            Log.i(TAG, "onDataChange: Recipe Creator Id = " + mRecipeCreatorId);
+                            Log.i(TAG, "UpdateDetails: Creator Id = " + mRecipeCreatorId);
+
+                            mUserRef.child(Constants.DATABASE_ROOT_USERS).child(mRecipeCreatorId).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Log.i(TAG, "onDataChange: getting user info for recipe");
+
+                                    User user = dataSnapshot.getValue(User.class);
+                                    if(user!=null){
+                                        Glide.with(getContext()).load(user.getUrl()).centerCrop().into(mUserPhoto);
+                                        Log.i(TAG, "onDataChange: user photo url = " + user.getUrl());
+                                        mUsername.setText(user.username);
+                                        Log.i(TAG, "onDataChange: user - username = " + user.getUsername());
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.e(TAG, "onCancelled: Database Error: " + databaseError.getMessage());
+                                }
+                            });
+                        }else{
+                            Log.e(TAG, "onDataChange: recipe is null.");
                         }
+                    }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-                    mUserRef.child(Constants.DATABASE_ROOT_USERS).child(mRecipeCreatorId).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Log.i(TAG, "onDataChange: getting user info for recipe");
-
-                            User user = dataSnapshot.getValue(User.class);
-                            if(user!=null){
-                                Glide.with(getContext()).load(user.getUrl()).centerCrop().into(mUserPhoto);
-                                Log.i(TAG, "onDataChange: user photo url = " + user.getUrl());
-                                mUsername.setText(user.username);
-                                Log.i(TAG, "onDataChange: user - username = " + user.getUsername());
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }else{
-                    Log.e(TAG, "onDataChange: recipe is null.");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, "onCancelled: Recipe Ref Database Error");
-            }
-        });
-
-
-        Log.i(TAG, "UpdateDetails: getting ingredients and instructions");
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e(TAG, "onCancelled: Recipe Ref Database Error");
+                    }
+                });
 
         // Retrieve the ingredients and add them to the list
         mIngredientDatabaseRef.child(Constants.DATABASE_RECIPE_INGREDIENT).child(mRecipeKey).addChildEventListener(new ChildEventListener() {
@@ -252,6 +254,7 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
             }
         });
 
+
         // Retrieve the instructions and add them to the list
         mInstructionsDatabaseRef.child(Constants.DATABASE_RECIPE_INSTRUCTION).child(mRecipeKey).addChildEventListener(new ChildEventListener() {
             @Override
@@ -289,19 +292,7 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
 
             }
         });
-        Log.i(TAG, "UpdateDetails: Completed the Update Details Method");
 
-
-    }
-
-    public String RecieveRecipeKey(){
-        Bundle bundle = getArguments();
-        String key = (String) bundle.get(Constants.EXTRA_RECIPE_KEY);
-        if(key!=null){
-            mRecipeKey = key;
-            Log.i(TAG, "RecieveRecipeKey: Recipe Key = " + mRecipeKey);
-        }
-        return mRecipeKey;
     }
 
     private void InitiateViewsAndAdapters(View view) {
@@ -317,12 +308,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         mUserPhoto = view.findViewById(R.id.recipe_details_user_photo);
         mUserPhoto.setOnClickListener(this);
         mUsername = view.findViewById(R.id.recipe_details_user_username);
-        mFollowUserButton = view.findViewById(R.id.recipe_details_user_follow_button);
-        mFollowUserButton.setOnClickListener(this);
-        Drawable buttonDrawable = mFollowUserButton.getBackground();
-        buttonDrawable = DrawableCompat.wrap(buttonDrawable);
-        DrawableCompat.setTintList(buttonDrawable,getContext().getResources().getColorStateList(R.color.follow_colors));
-        mFollowUserButton.setChecked(false);
 
         // Recyclerviews
         mIngredRV = view.findViewById(R.id.recipe_details_ingreds_rv);
@@ -378,6 +363,8 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
 
         return shareBodyText;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -464,9 +451,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.recipe_details_user_follow_button:
-                FollowUser();
-                break;
             case R.id.recipe_details_user_photo:
                 GoToUserProfile();
                 break;
@@ -486,24 +470,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         ft.addToBackStack(null);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
-    }
-
-    private void FollowUser() {
-        Log.i(TAG, "FollowUser: Following = " + mFollowUserButton.isChecked());
-        mDatabase = FirebaseDatabase.getInstance();
-        if(mFollowUserButton.isChecked()){
-            if(mRecipeCreatorId!=null){
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(mAuth.getCurrentUser().getUid()).child(mRecipeCreatorId).setValue(true);
-            }else{
-                Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
-            }
-        }else {
-            if(mRecipeCreatorId!=null){
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(mAuth.getCurrentUser().getUid()).child(mRecipeCreatorId).removeValue();
-            }else{
-                Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
-            }
-        }
     }
 
 

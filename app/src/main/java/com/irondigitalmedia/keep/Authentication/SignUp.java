@@ -1,8 +1,11 @@
 package com.irondigitalmedia.keep.Authentication;
 
+import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -34,12 +37,14 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     // Firebase Authentication
     private FirebaseAuth mAuth;
     private FirebaseUser mFBUser;
+    private Context mContext;
+    private MainActivity mainActivity;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_signup);
-
         // Views
         mEmail_ET = findViewById(R.id.signup_et_email);
         mPass_ET = findViewById(R.id.signup_et_password);

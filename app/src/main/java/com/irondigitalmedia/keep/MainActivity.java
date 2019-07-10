@@ -2,34 +2,24 @@ package com.irondigitalmedia.keep;
 
 import android.content.Intent;
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import androidx.fragment.app.FragmentTransaction;
-import androidx.transition.Explode;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
-import com.irondigitalmedia.keep.Adapters.SearchAdapter;
 import com.irondigitalmedia.keep.Authentication.Login;
-import com.irondigitalmedia.keep.Fragments.AddNewRecipeFrag;
+import com.irondigitalmedia.keep.Fragments.EditRecipe;
 import com.irondigitalmedia.keep.Fragments.GroceryFragment;
 import com.irondigitalmedia.keep.Fragments.ProfileFragment;
 import com.irondigitalmedia.keep.Fragments.RandomRecipeFragment;
-import com.irondigitalmedia.keep.Fragments.RecipeDetailsFragment;
 import com.irondigitalmedia.keep.Fragments.SearchFragment;
-import com.irondigitalmedia.keep.Model.Instruction;
 import com.irondigitalmedia.keep.Utils.Constants;
 
 public class MainActivity extends BaseActivity implements FirebaseAuth.AuthStateListener
@@ -42,7 +32,7 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
 
     private SearchFragment searchFragment;
     private ProfileFragment profileFragment;
-    private AddNewRecipeFrag addNewRecipeFrag;
+    private EditRecipe editRecipe;
     private GroceryFragment groceryFragment;
     private RandomRecipeFragment randomFragment;
 
@@ -73,7 +63,7 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
 
         searchFragment = new SearchFragment();
         profileFragment = new ProfileFragment();
-        addNewRecipeFrag = new AddNewRecipeFrag();
+        editRecipe = new EditRecipe();
         groceryFragment = new GroceryFragment();
         randomFragment = new RandomRecipeFragment();
 
@@ -94,13 +84,13 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
                         Log.i(TAG, "======================================================     setFragment: fragment ID: " + searchFragment.getTag());
                         return true;
 
-                    case R.id.nav_add_recipe:
+                    case R.id.nav_edit_recipe:
                         FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
-                        ft2.replace(R.id.main_frame,addNewRecipeFrag,Constants.FRAGMENT_TAG_RECIPE_EDIT);
+                        ft2.replace(R.id.main_frame, editRecipe,Constants.FRAGMENT_TAG_RECIPE_EDIT);
                         ft2.addToBackStack(null);
                         ft2.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                         ft2.commit();
-                        Log.i(TAG, "======================================================     setFragment: fragment ID: " + addNewRecipeFrag.getTag());
+                        Log.i(TAG, "======================================================     setFragment: fragment ID: " + editRecipe.getTag());
                         return true;
                     case R.id.nav_profile:
                         FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
@@ -149,6 +139,7 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
         Intent intent = new Intent(this, Login.class);
         startActivity(intent);
     }
+
 
     @Override
     protected void onResume() {
