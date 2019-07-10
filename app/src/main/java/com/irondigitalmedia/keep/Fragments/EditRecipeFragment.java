@@ -94,10 +94,10 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
 
 
     // Views
-    private EditText mIngreds_ET,mSteps_ET,mTitle_Et, mDesc_ET, mPrepTime_ET;
+    private EditText mIngreds_ET,mSteps_ET,mTitle_Et, mDesc_ET;
     private Bitmap bitmap;
     private ImageView mRecipePhoto;
-    private Button mIngredAdd,mIngredRemove,mStepAdd,mStepRemove;
+    private Button mIngredAdd,mIngredRemove,mStepAdd,mStepRemove,mPrepTime;
     private Switch mPrivacySwitch;
     private Boolean privacy;
     private RecyclerView mIngredRV,mStepRV;
@@ -185,8 +185,8 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
         mRecipePhoto = view.findViewById(R.id.recipe_add_imagview);
         mTitle_Et = view.findViewById(R.id.recipe_add_title_et);
         mDesc_ET = view.findViewById(R.id.recipe_add_desc_et);
-        mPrepTime_ET = view.findViewById(R.id.recipe_add_prepTime_et);
-        mPrepTime_ET.setOnClickListener(this);
+        mPrepTime = view.findViewById(R.id.recipe_add_prepTime_et);
+        mPrepTime.setOnClickListener(this);
         mRecipePhoto.setOnClickListener(this);
         mPrivacySwitch = view.findViewById(R.id.recipe_add_edit_privacy_switch);
         mPrivacySwitch.setChecked(false);
@@ -307,7 +307,7 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
 
         final String title = mTitle_Et.getText().toString().trim();
         final String desc = mDesc_ET.getText().toString().trim();
-        final String prepTime = mPrepTime_ET.getText().toString().trim();
+        final String prepTime = mPrepTime.getText().toString().trim();
 
         if(TextUtils.isEmpty(title)){
             Toast.makeText(mContext,"Enter a Recipe Title.",Toast.LENGTH_SHORT).show();
@@ -834,11 +834,14 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
 
         numberPicker1.setMaxValue(12);
         numberPicker1.setMinValue(0);
+        numberPicker1.setValue(0);
         numberPicker1.setWrapSelectorWheel(true);
         numberPicker1.setDividerColor(getResources().getColor(R.color.colorPrimary));
 
+
         numberPicker2.setMaxValue(59);
         numberPicker2.setMinValue(0);
+        numberPicker2.setValue(1);
         numberPicker2.setWrapSelectorWheel(true);
         numberPicker2.setDividerColor(getResources().getColor(R.color.colorPrimary));
 
@@ -854,7 +857,24 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
                 int NumVal2 = numberPicker2.getValue();
 
                 Log.i(TAG, "onClick: prep time = " + NumVal1 + "h" + " " + NumVal2 + "m");
-                mPrepTime_ET.setText(new StringBuilder().append(NumVal1).append("h").append(" ").append(NumVal2).append("m"));
+                if(NumVal1==0){
+                    if(NumVal2==0){
+                        dialog.dismiss();
+                        Toast.makeText(mContext, "Please enter prep time.", Toast.LENGTH_SHORT).show();
+                    }
+                    if(NumVal2>0){
+                        mPrepTime.setText(new StringBuilder().append(NumVal2).append("m"));
+                    }
+                }
+                if(NumVal1>0){
+                    if(NumVal2==0){
+                        mPrepTime.setText(new StringBuilder().append(NumVal1).append("h"));
+                    }
+                    if(NumVal2>0){
+                        mPrepTime.setText(new StringBuilder().append(NumVal1).append("h").append(" ").append(NumVal2).append("m"));
+                    }
+                }
+
             }
         });
 
