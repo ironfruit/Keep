@@ -66,7 +66,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        mRecipeKey = mRecipesList.get(position).getUid();
         holder.tv_recipe_title.setText(mRecipesList.get(position).getTitle());
         holder.tv_recipe_desc.setText(mRecipesList.get(position).getDesc());
         holder.tv_recipe_prepTime.setText(mRecipesList.get(position).getPrepTime());
@@ -103,8 +102,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 public void onClick(View v) {
                     RecipeDetailsFragment rd = new RecipeDetailsFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putString(Constants.EXTRA_RECIPE_KEY,mRecipeKey);
-                    Log.i(TAG, "onClick: Fragment Interaction recipe Key is = " + mRecipeKey);
+                    bundle.putString(Constants.EXTRA_RECIPE_KEY,mRecipesList.get(getAdapterPosition()).getUid());
+                    Log.i(TAG, "onClick: Fragment Interaction recipe Key is = " + mRecipesList.get(getAdapterPosition()).getUid());
                     FragmentTransaction ft = mainActivity.getSupportFragmentManager().beginTransaction();
                     rd.setArguments(bundle);
                     ft.replace(R.id.main_frame, rd, Constants.FRAGMENT_TAG_RECIPE_DETAILS);

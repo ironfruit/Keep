@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -94,7 +95,7 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     private ShareActionProvider shareActionProvider;
     private TextView mRecipeTitle, mRecipeCreator, mRecipeDesc,mRecipePrepTime, mUsername;
     private Recipe mRecipe;
-    public String mRecipeKey, mRecipeCreatorId;
+    public String mRecipeKey, mRecipeCreatorId, username;
     private Bundle info;
 
     private DatabaseReference mIngredientDatabaseRef;
@@ -105,6 +106,7 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     private FirebaseDatabase mDatabase;
     private Context mContext;
     private boolean followed;
+    private User user;
 
     private Menu menu;
 
@@ -190,7 +192,7 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     Log.i(TAG, "onDataChange: getting user info for recipe");
 
-                                    User user = dataSnapshot.getValue(User.class);
+                                    user = dataSnapshot.getValue(User.class);
                                     if(user!=null){
                                         Glide.with(getContext()).load(user.getUrl()).centerCrop().into(mUserPhoto);
                                         Log.i(TAG, "onDataChange: user photo url = " + user.getUrl());
@@ -343,23 +345,25 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     }
 
     public String ShareBodyText(){
+        String ingredients = "";
+        String steps = "";
+        String shareBodyText ="";
 
-        String shareBodyText = "Creator: " +"Get Username later..." + "\n" + "\n"
+        for(int i = 0; i < mIngredsList.size(); i++){
+            ingredients += mIngredsList.get(i).getIngredient() + "\n";
+        }
+
+        for(int i = 0; i < mStepsList.size(); i++){
+            steps += mStepsList.get(i).getNum() + " " +mStepsList.get(i).getStep() + "\n";
+        }
+
+        shareBodyText = "Creator: " + user.getUsername() + "\n" + "\n"
                 +"Title: " +mRecipe.getTitle() + "\n" + "\n"
                 +"Description: " + "\n" + "\n" +mRecipe.getDesc() + "\n" + "\n"
-                +"Prep Time: " +mRecipe.getPrepTime() + "\n" + "\n";
-
-        for(int i = 0;i<mIngredsList.size();i++){
-            int a = i + 1;
-            String ingredients = a + ".) " + mIngredsList.get(i).getIngredient();
-            Log.i(TAG, "ShareBodyText: " + ingredients);
-        }
-
-        for(int i = 0;i<mStepsList.size();i++){
-            int a = i + 1;
-            String instructions = a + ".) " + mStepsList.get(i).getStep();
-            Log.i(TAG, "ShareBodyText: " + instructions);
-        }
+                +"Prep Time: " +mRecipe.getPrepTime() + "\n" + "\n"
+                +"Ingredients: " + "\n" + "\n" +ingredients
+                + "\n"
+                +"Steps: "  + "\n" + "\n" +steps;
 
         return shareBodyText;
     }
