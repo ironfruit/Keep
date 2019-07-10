@@ -22,12 +22,8 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         android:screenOrientation="portrait">
-        <activity android:name=".EditProfile"
-            android:screenOrientation="portrait"></activity>
         <activity android:name=".Authentication.ProfileSetup"
             android:screenOrientation="portrait"></activity>
-        <activity android:name=".Settings"
-            android:screenOrientation="portrait"/>
         <activity android:name=".Authentication.Login"
             android:screenOrientation="portrait"/>
         <activity android:name=".Authentication.SignUp"

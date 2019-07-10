@@ -1,10 +1,12 @@
-package com.irondigitalmedia.keep;
+package com.irondigitalmedia.keep.Fragments;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.content.Context;
@@ -20,8 +22,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,8 +37,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +48,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.User;
+import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;
 
 import java.io.File;
@@ -60,9 +64,11 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class EditProfile extends AppCompatActivity implements View.OnClickListener{
+import static android.app.Activity.RESULT_OK;
 
-    private static final String TAG = EditProfile.class.getSimpleName();
+public class EditProfileFragment extends Fragment implements View.OnClickListener{
+
+    private static final String TAG = EditProfileFragment.class.getSimpleName();
 
     // Firebase Authentication
     private FirebaseAuth mAuth;
@@ -98,10 +104,21 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private Button mChangeEmail_BT, mChangePassword_BT,mResetPassword_Bt;
     private CircleImageView mProfileImage;
 
+    private MainActivity mainActivity;
+    private Toolbar toolbar;
+
+    public EditProfileFragment() {
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_edit_profile, container, false);
+
+        mainActivity = (MainActivity) view.getContext();
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+        toolbar.setTitle("Edit Profile");
 
         RequestPermissions();
 
@@ -110,16 +127,16 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
-        mProfileImage = findViewById(R.id.frag_profile_edit_image);
+        mProfileImage = view.findViewById(R.id.frag_profile_edit_image);
         mProfileImage.setOnClickListener(this);
-        mName = findViewById(R.id.frag_profile_edit_name);
-        mUsername = findViewById(R.id.frag_profile_edit_username);
-        mAbout = findViewById(R.id.frag_profile_edit_about);
-        mChangeEmail_BT = findViewById(R.id.frag_profile_edit_button_email);
+        mName = view.findViewById(R.id.frag_profile_edit_name);
+        mUsername = view.findViewById(R.id.frag_profile_edit_username);
+        mAbout = view.findViewById(R.id.frag_profile_edit_about);
+        mChangeEmail_BT = view.findViewById(R.id.frag_profile_edit_button_email);
         mChangeEmail_BT.setOnClickListener(this);
-        mChangePassword_BT = findViewById(R.id.frag_profile_edit_button_password);
+        mChangePassword_BT = view.findViewById(R.id.frag_profile_edit_button_password);
         mChangePassword_BT.setOnClickListener(this);
-        mUserProfilePrivacy = findViewById(R.id.frag_profile_edit_privacy_toggle);
+        mUserProfilePrivacy = view.findViewById(R.id.frag_profile_edit_privacy_toggle);
         mUserProfilePrivacy.setOnClickListener(this);
         if(getUid()!=null){
             myRef = database.getReference().child(Constants.DATABASE_ROOT_USERS).child(getUid());
@@ -130,7 +147,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                     mName.setText(user.name);
                     mUsername.setText(user.username);
                     mAbout.setText(user.about);
-                    Glide.with(getApplicationContext()).load(user.getUrl()).centerCrop().into(mProfileImage);
+                    Glide.with(getContext()).load(user.getUrl()).centerCrop().into(mProfileImage);
                     if(user.privacy){
                         mUserProfilePrivacy.setChecked(true);
                     }else{
@@ -144,11 +161,14 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 }
             });
         }
+        
+        return view;
     }
+
 
     private void SelectPhoto() {
         // setup the alert builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setItems(getResources().getStringArray(R.array.photo_import_options),
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -198,7 +218,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private void takePicture() throws IOException {
         Log.i(TAG, "TakePhoto: method has ran");
         Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(pictureIntent.resolveActivity(getPackageManager())!=null){
+        if(pictureIntent.resolveActivity(getActivity().getPackageManager())!=null){
             File imageFile = null;
 
             try{
@@ -210,7 +230,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             }
             if(imageFile!=null){
                 Log.i(TAG, "ChoosePhoto: starting the activity for result.");
-                imageFileURI = FileProvider.getUriForFile(this,"com.irondigitalmedia.fileprovider",imageFile);
+                imageFileURI = FileProvider.getUriForFile(getContext(),"com.irondigitalmedia.fileprovider",imageFile);
                 pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageFileURI);
                 startActivityForResult(pictureIntent,MEDIA_TYPE_IMAGE);
             }
@@ -226,7 +246,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
         String imageName = "PROFILE_" + getUid() + "_JPG_"+timeStamp+"_";
         Log.i(TAG, "getImageFile: imageName = " + imageName);
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         Log.i(TAG, "getImageFile: creating temp file...");
         File imageFile = File.createTempFile(imageName,".jpg",storageDir);
@@ -236,8 +256,8 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     }
 
     private void RequestPermissions() {
-        if(!hasPermissions(this, PERMISSIONS)){
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        if(!hasPermissions(getContext(), PERMISSIONS)){
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ALL);
         }
     }
 
@@ -339,7 +359,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
 
             Bitmap bitmap= null;
             try {
-                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageFileURI));
+                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(imageFileURI));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -349,7 +369,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             Bitmap bitmap= null;
             imageFileURI = data.getData();
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageFileURI);
+                bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(),imageFileURI);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -357,14 +377,13 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             mProfileImage.setImageBitmap(bitmap);
 
         }else {
-            Toast.makeText(this, "You haven't picked Image",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "You haven't picked Image",Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.edit_profile,menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        getActivity().getMenuInflater().inflate(R.menu.edit_profile,menu);
     }
 
     @Override
@@ -389,22 +408,18 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             childupdates.put(Constants.USER_PROPERTY_USERNAME,username);
             childupdates.put(Constants.USER_PROPERTY_ABOUT,about);
             myRef.updateChildren(childupdates);
-            onBackPressed();
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            getActivity().overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mName.getWindowToken(), 0);
-            InputMethodManager imm1 = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm1 = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm1.hideSoftInputFromWindow(mUsername.getWindowToken(), 1);
-            InputMethodManager imm2 = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm2 = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm2.hideSoftInputFromWindow(mAbout.getWindowToken(), 2);
         }
     }
 
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
-    }
+
 
     @Override
     public void onClick(View v) {
@@ -428,7 +443,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private void ChangePassword() {
         mUser = mAuth.getCurrentUser();
         // setup the alert builder
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Change Password")
                 .setPositiveButton("Reset", new DialogInterface.OnClickListener() {
                     @Override
@@ -437,7 +452,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                         mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(EditProfile.this, "Password Reset Email Sent.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Password Reset Email Sent.", Toast.LENGTH_SHORT).show();
                             }
                         });
                         dialogInterface.dismiss();
@@ -456,7 +471,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
 
     private void ChangeEmail() {
         // setup the alert builder
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = getLayoutInflater();
         View builderView = inflater.inflate(R.layout.edit_profile_dialog_email,null);
         mChangeEmail_ET = builderView.findViewById(R.id.edit_profile_dialog_email_ET);
@@ -469,13 +484,13 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                         mUser.updateEmail(mChangeEmail_Str).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(getApplicationContext(),"Email Update Successful.",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(),"Email Update Successful.",Toast.LENGTH_SHORT).show();
                                 Log.i(TAG, "onSuccess: Email Updated.");
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_LONG).show();
                                 Log.e(TAG, "onFailure: " + e.getMessage());
                             }
                         });

@@ -15,7 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.irondigitalmedia.keep.Authentication.Login;
-import com.irondigitalmedia.keep.Fragments.EditRecipe;
+import com.irondigitalmedia.keep.Fragments.EditRecipeFragment;
 import com.irondigitalmedia.keep.Fragments.GroceryFragment;
 import com.irondigitalmedia.keep.Fragments.ProfileFragment;
 import com.irondigitalmedia.keep.Fragments.RandomRecipeFragment;
@@ -32,7 +32,7 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
 
     private SearchFragment searchFragment;
     private ProfileFragment profileFragment;
-    private EditRecipe editRecipe;
+    private EditRecipeFragment editRecipeFragment;
     private GroceryFragment groceryFragment;
     private RandomRecipeFragment randomFragment;
 
@@ -63,7 +63,7 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
 
         searchFragment = new SearchFragment();
         profileFragment = new ProfileFragment();
-        editRecipe = new EditRecipe();
+        editRecipeFragment = new EditRecipeFragment();
         groceryFragment = new GroceryFragment();
         randomFragment = new RandomRecipeFragment();
 
@@ -86,11 +86,11 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
 
                     case R.id.nav_edit_recipe:
                         FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
-                        ft2.replace(R.id.main_frame, editRecipe,Constants.FRAGMENT_TAG_RECIPE_EDIT);
+                        ft2.replace(R.id.main_frame, editRecipeFragment,Constants.FRAGMENT_TAG_RECIPE_EDIT);
                         ft2.addToBackStack(null);
                         ft2.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                         ft2.commit();
-                        Log.i(TAG, "======================================================     setFragment: fragment ID: " + editRecipe.getTag());
+                        Log.i(TAG, "======================================================     setFragment: fragment ID: " + editRecipeFragment.getTag());
                         return true;
                     case R.id.nav_profile:
                         FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();

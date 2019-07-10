@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,12 +37,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.irondigitalmedia.keep.Adapters.ProfileRecipeAdapter;
 import com.irondigitalmedia.keep.Authentication.Login;
-import com.irondigitalmedia.keep.EditProfile;
 import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.Model.User;
 import com.irondigitalmedia.keep.R;
-import com.irondigitalmedia.keep.Settings;
 import com.irondigitalmedia.keep.Utils.Constants;
 
 import java.util.ArrayList;
@@ -458,17 +457,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void GoToEditProfile() {
         Log.i(TAG, "---------------GOTOEDITPROFILEMETHOD--------------");
-
-        Intent intent = new Intent(getActivity(), EditProfile.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.enter,R.anim.exit);
+        EditProfileFragment EPF = new EditProfileFragment();
+        FragmentTransaction ft = mainActivity.getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.main_frame,EPF, Constants.FRAGMENT_TAG_EDIT_PROFILE);
+        ft.addToBackStack(Constants.FRAGMENT_TAG_EDIT_PROFILE);
+        ft.setCustomAnimations(R.anim.left_to_right, R.anim.right_to_left);
+        ft.commit();
     }
 
     public void GoToSettings(){
         Log.i(TAG, "---------------GOTOSETTINGSMETHOD--------------");
-        Intent intent = new Intent(getActivity(), Settings.class);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.enter,R.anim.exit);
+        SettingsFragment s = new SettingsFragment();
+        FragmentTransaction ft = mainActivity.getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.main_frame,s, Constants.FRAGMENT_TAG_SETTINGS);
+        ft.addToBackStack(Constants.FRAGMENT_TAG_SETTINGS);
+        ft.setCustomAnimations(R.anim.left_to_right, R.anim.right_to_left);
+        ft.commit();
     }
 
     private boolean CheckUserLoggedIn() {

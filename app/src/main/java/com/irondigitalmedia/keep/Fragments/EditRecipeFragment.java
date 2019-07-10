@@ -88,9 +88,9 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EditRecipe extends BaseFragment implements View.OnClickListener {
+public class EditRecipeFragment extends BaseFragment implements View.OnClickListener {
 
-    private static final String TAG = EditRecipe.class.getSimpleName();
+    private static final String TAG = EditRecipeFragment.class.getSimpleName();
 
 
     // Views
@@ -150,7 +150,7 @@ public class EditRecipe extends BaseFragment implements View.OnClickListener {
     private MainActivity mainActivity;
     private Toolbar toolbar;
 
-    public EditRecipe() {
+    public EditRecipeFragment() {
         // Required empty public constructor
     }
 
@@ -906,7 +906,6 @@ public class EditRecipe extends BaseFragment implements View.OnClickListener {
             dialog.show();
         }
     }
-
 
     @Override
     public void onResume() {

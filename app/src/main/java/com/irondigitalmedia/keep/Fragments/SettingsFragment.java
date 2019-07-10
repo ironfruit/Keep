@@ -1,9 +1,11 @@
-package com.irondigitalmedia.keep;
+package com.irondigitalmedia.keep.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
@@ -26,18 +28,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.irondigitalmedia.keep.Authentication.Login;
+import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Option;
 import com.irondigitalmedia.keep.Model.User;
+import com.irondigitalmedia.keep.R;
 
 import java.util.List;
 
-public class Settings extends AppCompatActivity {
+public class SettingsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
 
 
-    private static final String TAG = Settings.class.getSimpleName();
+    private static final String TAG = SettingsFragment.class.getSimpleName();
 
     private Button mLogOut;
 
@@ -50,21 +54,31 @@ public class Settings extends AppCompatActivity {
     // String
     private String users = "users";
 
+    private MainActivity mainActivity;
+    private Toolbar toolbar;
+    private Context mContext;
 
+    public SettingsFragment() {
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Settings");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        mainActivity = (MainActivity) view.getContext();
+
+        toolbar = mainActivity.findViewById(R.id.main_toolbar);
+        mainActivity.setSupportActionBar(toolbar);
+        toolbar.setTitle("Settings");
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(),gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivity().getApplicationContext(),gso);
 
-        mLogOut = (Button) findViewById(R.id.settings_button_logout);
+        mLogOut = view.findViewById(R.id.settings_button_logout);
         mLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,8 +121,7 @@ public class Settings extends AppCompatActivity {
         mSettingsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mSettingsList.setItemAnimator(new DefaultItemAnimator());
         mSettingsList.setAdapter(adapter);*/
-
-
+        return view;
     }
 
     private void SignOut() {
@@ -119,32 +132,20 @@ public class Settings extends AppCompatActivity {
 
     private void GoToLogin() {
         Log.i(TAG, "GoToLogin: user is being taken back to the login");
-        Intent intent = new Intent(Settings.this, Login.class);
+        Intent intent = new Intent(getContext(), Login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        onBackPressed();
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         mAuth.getCurrentUser();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
-    }
+
 
     public class SettingsRecyclerViewAdapter extends RecyclerView.Adapter<SettingsRecyclerViewAdapter.MyViewHolder> {
 
