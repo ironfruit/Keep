@@ -119,6 +119,8 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     private Toolbar toolbar;
 
 
+
+
     public RecipeDetailsFragment() {
         // Required empty public constructor
     }
@@ -130,7 +132,9 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_details, container, false);
 
-        mainActivity = (MainActivity) view.getContext();
+        mContext = view.getContext();
+
+        mainActivity = (MainActivity) mContext;
 
         toolbar = mainActivity.findViewById(R.id.main_toolbar);
         mainActivity.setSupportActionBar(toolbar);
@@ -194,7 +198,7 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
 
                                     user = dataSnapshot.getValue(User.class);
                                     if(user!=null){
-                                        Glide.with(getContext()).load(user.getUrl()).centerCrop().into(mUserPhoto);
+                                        Glide.with(mContext).load(user.getUrl()).centerCrop().into(mUserPhoto);
                                         Log.i(TAG, "onDataChange: user photo url = " + user.getUrl());
                                         mUsername.setText(user.username);
                                         Log.i(TAG, "onDataChange: user - username = " + user.getUsername());

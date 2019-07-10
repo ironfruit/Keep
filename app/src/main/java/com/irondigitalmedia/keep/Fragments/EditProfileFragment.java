@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Context;
@@ -26,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -110,6 +112,14 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
     public EditProfileFragment() {
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -119,6 +129,8 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
         toolbar = mainActivity.findViewById(R.id.main_toolbar);
         mainActivity.setSupportActionBar(toolbar);
         toolbar.setTitle("Edit Profile");
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
 
         RequestPermissions();
 
@@ -383,7 +395,8 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().getMenuInflater().inflate(R.menu.edit_profile,menu);
+        inflater.inflate(R.menu.edit_profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -392,9 +405,19 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
 
             // Submit updated user profile info + photo
             SubmitUserProfileUpdates();
+            GoToProfile();
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void GoToProfile() {
+        ProfileFragment PF = new ProfileFragment();
+        FragmentTransaction ft = mainActivity.getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.main_frame,PF, Constants.FRAGMENT_TAG_RECIPE_PROFILE);
+        ft.addToBackStack(Constants.FRAGMENT_TAG_RECIPE_PROFILE);
+        ft.setCustomAnimations(R.anim.right_to_left, R.anim.left_to_right);
+        ft.commit();
     }
 
     private void SubmitUserProfileUpdates() {
@@ -527,6 +550,11 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
                 Log.i(TAG, "SetPrivacy: is null...");
             }
         }
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
     }
 
     public String getUid() {

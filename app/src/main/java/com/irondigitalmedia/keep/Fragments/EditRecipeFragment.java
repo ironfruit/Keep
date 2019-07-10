@@ -155,6 +155,13 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_add_edit, container, false);
@@ -163,7 +170,7 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         getActivity().setTitle("Edit Recipe");
-        setHasOptionsMenu(true);
+
         mainActivity = (MainActivity) view.getContext();
         mainActivity.mMainNav.setSelectedItemId(R.id.nav_edit_recipe);
 
@@ -457,7 +464,6 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
         if(item.getItemId()==R.id.recipe_menu_add_submit){
 
                 UploadRecipeObjectToCloud();
-                //SendFakeData();
         }
         if(item.getItemId()==R.id.recipe_menu_add_submit_fakedata){
             try {
@@ -466,8 +472,6 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
                 e.printStackTrace();
             }
             GoToSearch();
-
-            /*getFakeUriFromFile();*/
 
         }
         return super.onOptionsItemSelected(item);
