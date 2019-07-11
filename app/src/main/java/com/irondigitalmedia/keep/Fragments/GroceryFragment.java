@@ -47,12 +47,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.irondigitalmedia.keep.Adapters.GroceryAdapter;
 import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Grocery;
-import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;
 
@@ -60,9 +58,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 

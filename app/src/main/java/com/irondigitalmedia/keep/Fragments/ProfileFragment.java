@@ -54,6 +54,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
+    private RecipeDetailsFragment.DataListener listener;
+
+
     private static final String TAG = "ProfileFragment";
 
     // Firebase Authentication
@@ -89,241 +92,79 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Recipe mRecipe;
     private View view;
 
+    // Main Activity
     private MainActivity mainActivity;
+
+    // Main Toolbar
     private Toolbar toolbar;
 
-    // Boolean
-    private boolean UserAvailable = false;
+    // boolean
+    private boolean otherUserAvailable;
 
-    public ProfileFragment() {
-        // Required empty public constructor
+    public ProfileFragment() {}
+
+    public void setDataListener(String userId){
+
+        otherUserId = userId;
+        if(otherUserId!=null){
+            otherUserAvailable = true;
+        }else{
+            otherUserAvailable = false;
+        }
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e(TAG, "onCreateView: CREATE VIEW");
 
         // Create View and inflate it
         view = inflater.inflate(R.layout.fragment_profile, container, false);
         mContext = view.getContext();
-
         mainActivity = (MainActivity) view.getContext();
-        mainActivity.mMainNav.setSelectedItemId(R.id.nav_profile);
-
         toolbar = mainActivity.findViewById(R.id.main_toolbar);
         mainActivity.setSupportActionBar(toolbar);
+        mainActivity.mMainNav.setSelectedItemId(R.id.nav_profile);
         toolbar.setTitle(R.string.profile);
-        // inside your activity (if you did not enable transitions in your theme)
 
         // User is available continue operations
         InitializeViews(view);
 
-        Bundle bundle = getArguments();
-        if(bundle!=null){
-            otherUserId = bundle.getString(Constants.EXTRA_USER_UID);
-            Log.e(TAG, "CheckUserLoggedIn: User Id From Bundle = " + otherUserId);
-            UserAvailable = true;
-            userOptions = view.findViewById(R.id.profile_linear_user_options);
-            followOptions = view.findViewById(R.id.profile_linear_follow);
-            userOptions.setVisibility(View.GONE);
-            followOptions.setVisibility(View.VISIBLE);
-            UpdateUserClickedProfile(otherUserId);
-            LoadUserClickedRecipeGrid(otherUserId);
+        if(otherUserAvailable){
+            LoadOtherUser();
         }else{
-            Log.d(TAG, "CheckUserLoggedIn: CHECKING IF USER IS AVAILABLE");
-            mAuth = FirebaseAuth.getInstance();
-            mUser = mAuth.getCurrentUser();
-            if(mUser != null && mAuth != null){
-                Log.i(TAG, "CheckUserLoggedIn: User Available ..............." + mUser.getEmail());
-                mUser = mAuth.getCurrentUser();
-                LoadUserRecipePhotoGrid();
-                UpdateProfile();
-                UserAvailable = true;
-            } else {
-                UserAvailable = false;
-                Log.e(TAG, "onStart: mUser is NULL sending to login...");
-                Intent intent = new Intent(getContext(), Login.class);
-                startActivity(intent);
-            }
+            LoadLoggedInUser();
         }
-
-
 
         // Inflate the layout for this fragment
         return view;
     }
 
-
-    private void UpdateProfile() {
-        database = FirebaseDatabase.getInstance();
-        mStorage = FirebaseStorage.getInstance().getReference();
-        myRef = database.getReference();
-        RecipeCountRef = database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES);
-        FollowersCountRef = database.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS);
-        Log.i(TAG, "UpdateProfile: updating the profile views with user data...");
-        if (mUser != null) {
-            myRef.child(Constants.DATABASE_ROOT_USERS).child(getUid()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Log.i(TAG, "onDataChange: Getting user profile info.");
-                    user = dataSnapshot.getValue(User.class);
-                    Glide.with(getActivity())
-                            .load(user.getUrl())
-                            .centerCrop()
-                            .into(mProfileImage);
-                    mProfName.setText(user.getName());
-                    mProfAbout.setText(user.getAbout());
-                    getActivity().setTitle(user.getUsername());
-
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.i(TAG, "onCancelled: Value Event Listener Cancelled for profile update info.");
-                }
-            });
-            Log.i(TAG, "UpdateProfile: getting recipe count");
-            myRef.child(Constants.DATABASE_ROOT_FOLLOWERS).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    if(dataSnapshot.hasChild(getUid())){
-                        Log.e(TAG, "onChildAdded: " + dataSnapshot.child(getUid()).getChildrenCount());
-                    }
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-            Log.i(TAG, "UpdateProfile: getting follower count");
-            myRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-            myRef.keepSynced(true);
-
-            // USER LOGGED IN
-        } else {
-
-
-        }
-
+    private void LoadOtherUser() {
+        Log.e(TAG, "USER AVAILABLE: User Id From Bundle = " + otherUserId);
+        userOptions.setVisibility(View.GONE);
+        followOptions.setVisibility(View.VISIBLE);
+        UpdateUserClickedProfile();
+        LoadUserClickedRecipeGrid();
     }
 
-    private void LoadUserRecipePhotoGrid() {
-        database = FirebaseDatabase.getInstance();
+    private void LoadLoggedInUser() {
+        Log.d(TAG, "CheckUserLoggedIn: CHECKING IF USER IS AVAILABLE");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        if(mUser!=null){
-            database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES)
-                    .child(mUser.getUid()).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    mRecipe = dataSnapshot.getValue(Recipe.class);
-                    mRecipesPhotos.add(mRecipe);
-                    PRA.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    mRecipe = dataSnapshot.getValue(Recipe.class);
-                    mRecipesPhotos.add(mRecipe);
-                    PRA.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    mRecipe = dataSnapshot.getValue(Recipe.class);
-                    mRecipesPhotos.remove(mRecipe);
-                    PRA.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }else{
-            database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES)
-                    .child(mUser.getUid()).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    mRecipe = dataSnapshot.getValue(Recipe.class);
-                    mRecipesPhotos.add(mRecipe);
-                    PRA.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    mRecipe = dataSnapshot.getValue(Recipe.class);
-                    mRecipesPhotos.add(mRecipe);
-                    PRA.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    mRecipe = dataSnapshot.getValue(Recipe.class);
-                    mRecipesPhotos.remove(mRecipe);
-                    PRA.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-            database.getReference().keepSynced(true);
+        if(mUser != null && mAuth != null){
+            Log.i(TAG, "CheckUserLoggedIn: User Available ..............." + mUser.getEmail());
+            mUser = mAuth.getCurrentUser();
+            LoadUserRecipePhotoGrid();
+            UpdateProfile();
+        } else {
+            Log.e(TAG, "onStart: mUser is NULL sending to login...");
+            Intent intent = new Intent(getContext(), Login.class);
+            startActivity(intent);
         }
     }
 
-    private void UpdateUserClickedProfile(String userId) {
-        otherUserId = userId;
+    private void UpdateUserClickedProfile() {
         Log.i(TAG, "UpdateUserClickedProfile: Clicked User Method for " + otherUserId);
         database = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
@@ -443,8 +284,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void LoadUserClickedRecipeGrid(String userId) {
-        otherUserId = userId;
+    private void LoadUserClickedRecipeGrid() {
         Log.i(TAG, "LoadUserClickedRecipeGrid: Clicked User Method for " + otherUserId);
         database = FirebaseDatabase.getInstance();
         database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES)
@@ -480,10 +320,135 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+    }
+
+    private void UpdateProfile() {
+        database = FirebaseDatabase.getInstance();
+        mStorage = FirebaseStorage.getInstance().getReference();
+        myRef = database.getReference();
+        RecipeCountRef = database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES);
+        FollowersCountRef = database.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS);
+        Log.i(TAG, "UpdateProfile: updating the profile views with user data...");
+        if (mUser != null) {
+            myRef.child(Constants.DATABASE_ROOT_USERS).child(getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Log.i(TAG, "onDataChange: Getting user profile info.");
+                    user = dataSnapshot.getValue(User.class);
+                    Glide.with(getActivity())
+                            .load(user.getUrl())
+                            .centerCrop()
+                            .into(mProfileImage);
+                    mProfName.setText(user.getName());
+                    mProfAbout.setText(user.getAbout());
+                    getActivity().setTitle(user.getUsername());
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.i(TAG, "onCancelled: Value Event Listener Cancelled for profile update info.");
+                }
+            });
+            Log.i(TAG, "UpdateProfile: getting recipe count");
+            myRef.child(Constants.DATABASE_ROOT_FOLLOWERS).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    if(dataSnapshot.hasChild(getUid())){
+                        Log.e(TAG, "onChildAdded: " + dataSnapshot.child(getUid()).getChildrenCount());
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+            Log.i(TAG, "UpdateProfile: getting follower count");
+            myRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+            myRef.keepSynced(true);
+
+            // USER LOGGED IN
         }
+    }
+
+    private void LoadUserRecipePhotoGrid() {
+        database = FirebaseDatabase.getInstance();
+        database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES)
+                .child(getUid()).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                mRecipe = dataSnapshot.getValue(Recipe.class);
+                mRecipesPhotos.add(mRecipe);
+                PRA.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                mRecipe = dataSnapshot.getValue(Recipe.class);
+                mRecipesPhotos.add(mRecipe);
+                PRA.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                mRecipe = dataSnapshot.getValue(Recipe.class);
+                mRecipesPhotos.remove(mRecipe);
+                PRA.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     private void InitializeViews(View view) {
         // Setup Views
+        userOptions = view.findViewById(R.id.profile_linear_user_options);
+        followOptions = view.findViewById(R.id.profile_linear_follow);
         mFollowUserButton = view.findViewById(R.id.profile_button_follow);
         mFollowUserButton.setOnClickListener(this);
         Drawable buttonDrawable = mFollowUserButton.getBackground();
@@ -509,26 +474,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mProfRecycler.setAdapter(PRA);
     }
 
-    private void GoToLogin() {
-        Intent intent = new Intent(getContext(), Login.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.profile_button_settings:
-                GoToSettings();
-                break;
-            case R.id.profile_button_editprofile:
-                GoToEditProfile();
-                break;
-            case R.id.profile_button_follow:
-                FollowUser();
-                break;
-            default:
-                break;
+    private void FollowUser() {
+        Log.i(TAG, "FollowUser: Following = " + mFollowUserButton.isChecked());
+        mDatabase = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        if(mFollowUserButton.isChecked()){
+            if(otherUserId !=null){
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(getUid()).child(otherUserId).setValue(true);
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).child(getUid()).setValue(true);
+            }else{
+                Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
+            }
+        }else {
+            if(otherUserId !=null){
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).child(getUid()).removeValue();
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(getUid()).child(otherUserId).removeValue();
+            }else{
+                Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
+            }
         }
     }
 
@@ -552,35 +515,33 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         ft.commit();
     }
 
-    private boolean CheckUserLoggedIn() {
-
-
-        return UserAvailable;
-    }
-
-    private void FollowUser() {
-        Log.i(TAG, "FollowUser: Following = " + mFollowUserButton.isChecked());
-        mDatabase = FirebaseDatabase.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        if(mFollowUserButton.isChecked()){
-            if(otherUserId !=null){
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(getUid()).child(otherUserId).setValue(true);
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).child(getUid()).setValue(true);
-            }else{
-                Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
-            }
-        }else {
-            if(otherUserId !=null){
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).child(getUid()).removeValue();
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(getUid()).child(otherUserId).removeValue();
-            }else{
-                Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
-            }
-        }
-    }
-
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        setDataListener(null);
+        Log.e(TAG, "onDetach: DETACHING");
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.profile_button_settings:
+                GoToSettings();
+                break;
+            case R.id.profile_button_editprofile:
+                GoToEditProfile();
+                break;
+            case R.id.profile_button_follow:
+                FollowUser();
+                break;
+            default:
+                break;
+        }
     }
 
 

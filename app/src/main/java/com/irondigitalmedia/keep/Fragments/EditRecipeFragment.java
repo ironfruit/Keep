@@ -407,7 +407,7 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
 
     // send user back to the recipe fragment
     public void GoToSearch(){
-        SearchFragment sf = new SearchFragment();
+        HomeFragment sf = new HomeFragment();
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.replace(R.id.main_frame, sf);

@@ -414,8 +414,8 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
     private void GoToProfile() {
         ProfileFragment PF = new ProfileFragment();
         FragmentTransaction ft = mainActivity.getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.main_frame,PF, Constants.FRAGMENT_TAG_RECIPE_PROFILE);
-        ft.addToBackStack(Constants.FRAGMENT_TAG_RECIPE_PROFILE);
+        ft.replace(R.id.main_frame,PF, Constants.FRAGMENT_TAG_PROFILE);
+        ft.addToBackStack(Constants.FRAGMENT_TAG_PROFILE);
         ft.setCustomAnimations(R.anim.right_to_left, R.anim.left_to_right);
         ft.commit();
     }

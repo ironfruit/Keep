@@ -6,14 +6,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -32,13 +30,11 @@ import android.widget.ShareActionProvider;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -71,7 +67,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class RecipeDetailsFragment extends Fragment implements View.OnClickListener{
     public static final String TAG = RecipeDetailsFragment.class.getSimpleName();
 
-    public static final String EXTRA_RECIPE_KEY = "recipe_key";
+    private DataListener listener;
+
     // Views
     private Bitmap bitmap;
     private ImageView mRecipePhoto;
@@ -425,10 +422,10 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     }
 
     private void GotoSearch() {
-        SearchFragment search = new SearchFragment();
+        HomeFragment search = new HomeFragment();
         Log.i(TAG, "onClick: Fragment UserId that was clicked = " + mRecipeCreatorId);
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.main_frame,search,Constants.FRAGMENT_TAG_RECIPE_SEARCH);
+        ft.replace(R.id.main_frame,search,Constants.FRAGMENT_TAG_HOME);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
     }
@@ -451,10 +448,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         super.onStop();
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     @Override
     public void onClick(View view) {
@@ -470,12 +463,10 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     private void GoToUserProfile() {
         ProfileFragment pf = new ProfileFragment();
         Log.i(TAG, "onClick: Fragment UserId that was clicked = " + mRecipeCreatorId);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.EXTRA_USER_UID,mRecipeCreatorId);
-        pf.setArguments(bundle);
+        listener.DataListener(mRecipeCreatorId);
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.main_frame,pf,Constants.FRAGMENT_TAG_RECIPE_PROFILE)
-                .addToBackStack(Constants.FRAGMENT_TAG_RECIPE_PROFILE)
+        ft.replace(R.id.main_frame,pf)
+                .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
     }
@@ -540,5 +531,26 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    public interface DataListener{
+        void DataListener(String userId);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof DataListener){
+            listener = (DataListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+            + " must implement DataListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 }

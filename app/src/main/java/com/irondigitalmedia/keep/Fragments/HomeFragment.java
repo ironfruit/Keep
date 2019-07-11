@@ -22,7 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.irondigitalmedia.keep.Adapters.SearchAdapter;
+import com.irondigitalmedia.keep.Adapters.HomeListAdapter;
 import com.irondigitalmedia.keep.BaseActivity;
 import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
@@ -33,14 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SearchFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
-    private static final String TAG = SearchFragment.class.getSimpleName();
+    private static final String TAG = HomeFragment.class.getSimpleName();
 
     private List<Recipe> mRecipeList;
     private List<String> mRecipeIds;
     private RecyclerView SearchRecyclerView;
-    private SearchAdapter adapter;
+    private HomeListAdapter adapter;
     private LinearLayoutManager LLM;
     private Context mContext;
     private FirebaseDatabase database;
@@ -51,7 +51,7 @@ public class SearchFragment extends Fragment {
     private String dataSnapShotKey;
     private Toolbar toolbar;
 
-    public SearchFragment() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
@@ -69,11 +69,11 @@ public class SearchFragment extends Fragment {
         LLM = new LinearLayoutManager(getContext());
         SearchRecyclerView.setLayoutManager(LLM);
         SearchRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new SearchAdapter(mContext, mRecipeList);
+        adapter = new HomeListAdapter(mContext, mRecipeList);
         SearchRecyclerView.setAdapter(adapter);
 
         mainActivity = (MainActivity) view.getContext();
-        mainActivity.mMainNav.setSelectedItemId(R.id.nav_search);
+        mainActivity.mMainNav.setSelectedItemId(R.id.nav_home);
 
         toolbar = mainActivity.findViewById(R.id.main_toolbar);
         mainActivity.setSupportActionBar(toolbar);

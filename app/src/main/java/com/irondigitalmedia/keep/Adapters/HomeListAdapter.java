@@ -1,8 +1,6 @@
 package com.irondigitalmedia.keep.Adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,26 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.irondigitalmedia.keep.Fragments.RecipeDetailsFragment;
 import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
@@ -38,18 +26,18 @@ import com.irondigitalmedia.keep.Utils.Constants;
 
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
-    private static final String TAG = "SearchFragment";
+public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.ViewHolder> {
+    private static final String TAG = "HomeFragment";
     private DatabaseReference mDatabase;
     private Context context;
     private List<Recipe> mRecipesList;
     private MainActivity mainActivity;
     private String mRecipeKey;
 
-    public SearchAdapter(Context context, List<Recipe> mRecipesList) {
+    public HomeListAdapter(Context context, List<Recipe> mRecipesList) {
         this.context = context;
         this.mRecipesList = mRecipesList;
-        Log.i(TAG, "SearchAdapter: List Size = " + mRecipesList.size());
+        Log.i(TAG, "HomeListAdapter: List Size = " + mRecipesList.size());
     }
 
     @NonNull
@@ -61,7 +49,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
 
-        return new SearchAdapter.ViewHolder(view);
+        return new HomeListAdapter.ViewHolder(view);
     }
 
     @Override
