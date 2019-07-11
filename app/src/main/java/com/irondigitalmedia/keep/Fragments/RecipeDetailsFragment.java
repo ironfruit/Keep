@@ -146,7 +146,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
     }
 
     public String RecieveRecipeKey(){
-        Log.i(TAG, "RecieveRecipeKey: =======================================RECEIVING RECIPE KEY BEGIN================================================== ");
         Bundle bundle = getArguments();
         if(bundle!=null){
             String key = bundle.getString(Constants.EXTRA_RECIPE_KEY);
@@ -155,7 +154,6 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
                 Log.i(TAG, "RecieveRecipeKey: Recipe Key = " + mRecipeKey);
             }
         }
-        Log.i(TAG, "RecieveRecipeKey: =======================================RECEIVING RECIPE KEY END================================================== ");
         return mRecipeKey;
     }
 
@@ -173,11 +171,11 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         mRecipe = dataSnapshot.getValue(Recipe.class);
                         if(mRecipe!=null){
-                            getActivity().setTitle(mRecipe.title);
-                            mRecipeDesc.setText(mRecipe.desc);
-                            mRecipePrepTime.setText(mRecipe.prepTime);
-                            Glide.with(getContext()).load(mRecipe.url).into(mRecipePhoto);
-                            mRecipeCreatorId = mRecipe.creatorId;
+                            getActivity().setTitle(mRecipe.getTitle());
+                            mRecipeDesc.setText(mRecipe.getDesc());
+                            mRecipePrepTime.setText(mRecipe.getPrepTime());
+                            Glide.with(getContext()).load(mRecipe.getUrl()).into(mRecipePhoto);
+                            mRecipeCreatorId = mRecipe.getCreatorId();
                             if(mRecipeCreatorId.equalsIgnoreCase(getUid())){
                                 if(menu!=null){
                                     menu.findItem(R.id.delete).setVisible(true);

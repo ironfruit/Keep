@@ -106,12 +106,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void setDataListener(String userId){
 
         otherUserId = userId;
-        if(otherUserId!=null){
-            otherUserAvailable = true;
-        }else{
+        Log.i(TAG, "setDataListener: " + otherUserId);
+        if(otherUserId.equals(getUid())){
             otherUserAvailable = false;
+        }else{
+            otherUserAvailable = true;
         }
     }
+
+    public String getUserId(){return otherUserId;}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,6 +134,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // User is available continue operations
         InitializeViews(view);
 
+        Log.e(TAG, "onCreateView: USER ID = " + getUserId());
+
         if(otherUserAvailable){
             LoadOtherUser();
         }else{
@@ -142,7 +147,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void LoadOtherUser() {
-        Log.e(TAG, "USER AVAILABLE: User Id From Bundle = " + otherUserId);
+        Log.e(TAG, "USER AVAILABLE: User Id = " + otherUserId);
         userOptions.setVisibility(View.GONE);
         followOptions.setVisibility(View.VISIBLE);
         UpdateUserClickedProfile();
