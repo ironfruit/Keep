@@ -10,7 +10,6 @@ public class Followers {
     public String userId;
     public String followerId;
     public int followercount = 0;
-    public Map<String,Boolean> followers = new HashMap<>();
 
     public Followers() {
     }
@@ -36,15 +35,6 @@ public class Followers {
         this.followerId = followerId;
     }
 
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("userId",userId);
-        result.put("followerId",followerId);
-        result.put("followercount",followercount);
-        result.put("followers",followers);
-        return result;
-    }
 
 
 }

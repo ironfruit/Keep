@@ -34,4 +34,5 @@ public class Constants {
     public static final String USER_PROPERTY_PRIVACY_PUBLIC = "Public";
     public static final String USER_PROFILE_PHOTO = "Profile_Photo.jpg";
     public static final String USER_PROFILE = "profile";
+    public static final String GOOGLE_ACCOUNT = "google_account";
 }

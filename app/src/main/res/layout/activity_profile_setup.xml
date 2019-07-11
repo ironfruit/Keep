@@ -1,48 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Authentication.ProfileSetup"
-    android:background="#696969"
     android:orientation="vertical">
 
-    <androidx.core.widget.ContentLoadingProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/profile_setup_progressbar"
-        android:layout_marginLeft="100dp"
-        android:layout_marginTop="200dp"
-        android:minHeight="50dp"
-        android:minWidth="200dp"
-        android:max="100"
-        android:indeterminate="false"
-        android:progress="0"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="370dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:padding="8dp"
-        app:cardCornerRadius="5dp">
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fadeScrollbars="true">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp">
-
-            <RelativeLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp">
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="100dp"
@@ -61,90 +38,95 @@
                 android:id="@+id/profile_setup_image_add"
                 android:src="@drawable/ic_add_circle"
                 android:foreground="?android:attr/selectableItemBackground"/>
-            </RelativeLayout>
-            <TextView
-                android:id="@+id/textView2"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:textColor="@android:color/black"
-                android:text="Add Profile Photo" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="50dp"
-                android:paddingTop="30dp">
-
-                <TextView
-                    android:id="@+id/profile_setup_name_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="Name" />
-
-                <EditText
-                    android:id="@+id/profile_setup_name_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:ems="10"
-                    android:maxLength="25"
-                    android:textColor="@android:color/black"
-                    android:inputType="textPersonName"
-                    android:hint="Name" />
-
-                <TextView
-                    android:id="@+id/profile_setup_username_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="Username" />
-
-                <EditText
-                    android:id="@+id/profile_setup_username_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:ems="10"
-                    android:maxLength="25"
-                    android:textColor="@android:color/black"
-                    android:inputType="text"
-                    android:hint="Username" />
-
-                <TextView
-                    android:id="@+id/profile_setup_about_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="About" />
-
-                <EditText
-                    android:id="@+id/profile_setup_about_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:ems="10"
-                    android:lines="5"
-                    android:maxLines="6"
-                    android:gravity="top|left"
-                    android:scrollbars="vertical"
-                    android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
-                    android:textColor="@android:color/black"
-                    android:hint="About" />
-
-
-            </LinearLayout>
-        <LinearLayout
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/textView2"
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@android:color/black"
+            android:text="Add Profile Photo" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="50dp"
+            android:paddingTop="30dp">
+
+            <TextView
+                android:id="@+id/profile_setup_name_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Name" />
+
+            <EditText
+                android:imeOptions="actionDone"
+                android:id="@+id/profile_setup_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:ems="10"
+                android:maxLength="25"
+                android:textColor="@android:color/black"
+                android:inputType="textPersonName"
+                android:hint="Name" />
+
+            <TextView
+                android:id="@+id/profile_setup_username_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Username" />
+
+            <EditText
+                android:imeOptions="actionDone"
+                android:imeActionId="@android:integer/config_shortAnimTime"
+                android:imeActionLabel="Username"
+                android:id="@+id/profile_setup_username_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:ems="10"
+                android:maxLength="25"
+                android:digits="@string/edittext_username_digits"
+                android:textColor="@android:color/black"
+                android:inputType="text"
+                android:hint="Username" />
+
+            <TextView
+                android:id="@+id/profile_setup_about_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="About" />
+
+            <EditText
+                android:imeOptions="actionDone"
+                android:id="@+id/profile_setup_about_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:ems="10"
+                android:maxLines="6"
+                android:gravity="top|left"
+                android:scrollbars="vertical"
+                android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+                android:textColor="@android:color/black"
+                android:hint="About" />
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="bottom">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:weightSum="2"
                 android:layout_marginBottom="20dp">
@@ -171,9 +153,8 @@
             </LinearLayout>
         </LinearLayout>
 
-        </LinearLayout>
+    </LinearLayout>
 
-        </ScrollView>
-    </androidx.cardview.widget.CardView>
 
-</RelativeLayout>
+
+</androidx.core.widget.NestedScrollView>

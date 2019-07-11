@@ -59,7 +59,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     // Firebase Authentication
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
-    private String userUID;
+    private String otherUserId;
 
     // Firebase Database Reference
     private StorageReference mStorage;
@@ -117,18 +117,39 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         toolbar.setTitle(R.string.profile);
         // inside your activity (if you did not enable transitions in your theme)
 
+        // User is available continue operations
+        InitializeViews(view);
 
-        if(CheckUserLoggedIn()){
-
-            // User is available continue operations
-            InitializeViews(view);
-
-        } else {
-
-            // Send user to login screen to login.
-            GoToLogin();
-
+        Bundle bundle = getArguments();
+        if(bundle!=null){
+            otherUserId = bundle.getString(Constants.EXTRA_USER_UID);
+            Log.e(TAG, "CheckUserLoggedIn: User Id From Bundle = " + otherUserId);
+            UserAvailable = true;
+            userOptions = view.findViewById(R.id.profile_linear_user_options);
+            followOptions = view.findViewById(R.id.profile_linear_follow);
+            userOptions.setVisibility(View.GONE);
+            followOptions.setVisibility(View.VISIBLE);
+            UpdateUserClickedProfile(otherUserId);
+            LoadUserClickedRecipeGrid(otherUserId);
+        }else{
+            Log.d(TAG, "CheckUserLoggedIn: CHECKING IF USER IS AVAILABLE");
+            mAuth = FirebaseAuth.getInstance();
+            mUser = mAuth.getCurrentUser();
+            if(mUser != null && mAuth != null){
+                Log.i(TAG, "CheckUserLoggedIn: User Available ..............." + mUser.getEmail());
+                mUser = mAuth.getCurrentUser();
+                LoadUserRecipePhotoGrid();
+                UpdateProfile();
+                UserAvailable = true;
+            } else {
+                UserAvailable = false;
+                Log.e(TAG, "onStart: mUser is NULL sending to login...");
+                Intent intent = new Intent(getContext(), Login.class);
+                startActivity(intent);
+            }
         }
+
+
 
         // Inflate the layout for this fragment
         return view;
@@ -143,19 +164,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         FollowersCountRef = database.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS);
         Log.i(TAG, "UpdateProfile: updating the profile views with user data...");
         if (mUser != null) {
-            myRef = database.getReference().child(users).child(mUser.getUid());
-            myRef.addValueEventListener(new ValueEventListener() {
+            myRef.child(Constants.DATABASE_ROOT_USERS).child(getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Log.i(TAG, "onDataChange: Getting user profile info.");
                     user = dataSnapshot.getValue(User.class);
                     Glide.with(getActivity())
-                            .load(user.url)
+                            .load(user.getUrl())
                             .centerCrop()
                             .into(mProfileImage);
-                    mProfName.setText(user.name);
-                    mProfAbout.setText(user.about);
-                    getActivity().setTitle(user.username);
+                    mProfName.setText(user.getName());
+                    mProfAbout.setText(user.getAbout());
+                    getActivity().setTitle(user.getUsername());
 
 
                 }
@@ -166,13 +186,25 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
             });
             Log.i(TAG, "UpdateProfile: getting recipe count");
-            myRef.child(Constants.DATABASE_ROOT_FOLLOWERS)
-                    .child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            myRef.child(Constants.DATABASE_ROOT_FOLLOWERS).addChildEventListener(new ChildEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    // Check follower count
-                    mFollowers.setText(dataSnapshot.getChildrenCount() + "");
-                    Log.i(TAG, "onDataChange: Recipe Count " + dataSnapshot.getChildrenCount());
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    if(dataSnapshot.hasChild(getUid())){
+                        Log.e(TAG, "onChildAdded: " + dataSnapshot.child(getUid()).getChildrenCount());
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                 }
 
                 @Override
@@ -181,13 +213,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
             });
             Log.i(TAG, "UpdateProfile: getting follower count");
-            myRef.child(Constants.DATABASE_ROOT_USERS_RECIPES)
-                    .child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            myRef.addChildEventListener(new ChildEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    // Check Recipe Count
-                    mRecipeCount.setText(dataSnapshot.getChildrenCount() + "");
-                    Log.i(TAG, "onDataChange: Recipe Count " + dataSnapshot.getChildrenCount());
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                 }
 
                 @Override
@@ -195,7 +236,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 }
             });
-
             myRef.keepSynced(true);
 
             // USER LOGGED IN
@@ -282,8 +322,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void UpdateUserClickedProfile() {
-        Log.i(TAG, "UpdateUserClickedProfile: Clicked User Method");
+    private void UpdateUserClickedProfile(String userId) {
+        otherUserId = userId;
+        Log.i(TAG, "UpdateUserClickedProfile: Clicked User Method for " + otherUserId);
         database = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
         myRef = database.getReference();
@@ -292,28 +333,28 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mDatabase = database;
         // USER CLICKED
         Log.i(TAG, "UpdateProfile: No User Is Available Checking for clicked user");
-        myRef = database.getReference().child(users).child(userUID);
-        myRef.addValueEventListener(new ValueEventListener() {
+        myRef.child(Constants.DATABASE_ROOT_USERS).child(otherUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onDataChange: Getting user profile info." + " " + userUID);
+                Log.i(TAG, "onDataChange: Getting user profile info." + " " + otherUserId);
                 user = dataSnapshot.getValue(User.class);
+                Log.e(TAG, "onDataChange: User: " + user.getUsername());
                 Glide.with(getActivity())
                         .load(user.url)
                         .centerCrop()
                         .into(mProfileImage);
-                mProfName.setText(user.name);
-                mProfAbout.setText(user.about);
-                getActivity().setTitle(user.username);
+                mProfName.setText(user.getName());
+                mProfAbout.setText(user.getAbout());
+                getActivity().setTitle(user.getUsername());
                 mAuth = FirebaseAuth.getInstance();
 
                 mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING)
-                        .child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+                        .child(otherUserId).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChild(userUID)){
+                        if(dataSnapshot.hasChild(otherUserId)){
                             mFollowUserButton.setChecked(true);
-                            Log.i(TAG, "onDataChange: Following User at " + mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(mAuth.getCurrentUser().getUid()).child(userUID));
+                            Log.i(TAG, "onDataChange: Following User...");
                         }else{
                             Log.i(TAG, "onDataChange: Not following user...");
                             mFollowUserButton.setChecked(false);
@@ -335,13 +376,31 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
 
         Log.i(TAG, "UpdateProfile: getting recipe count");
-        myRef.child(Constants.DATABASE_ROOT_FOLLOWERS)
-                .child(userUID).addValueEventListener(new ValueEventListener() {
+        myRef.child(Constants.DATABASE_ROOT_USERS_RECIPES).addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Check follower count
-                mFollowers.setText(dataSnapshot.getChildrenCount() + "");
-                Log.i(TAG, "onDataChange: Recipe Count " + dataSnapshot.getChildrenCount());
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    Log.e(snap.getKey(),snap.getChildrenCount() + " - Follower");
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    Log.e(snap.getKey(),snap.getChildrenCount() + " - Follower");
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    Log.e(snap.getKey(),snap.getChildrenCount() + " - Follower");
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
             }
 
             @Override
@@ -350,13 +409,31 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         });
         Log.i(TAG, "UpdateProfile: getting follower count");
-        myRef.child(Constants.DATABASE_ROOT_USERS_RECIPES)
-                .child(userUID).addValueEventListener(new ValueEventListener() {
+        myRef.child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Check Recipe Count
-                mRecipeCount.setText(dataSnapshot.getChildrenCount() + "");
-                Log.i(TAG, "onDataChange: Recipe Count " + dataSnapshot.getChildrenCount());
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    Log.e(snap.getKey(),snap.getChildrenCount() + " - Follower");
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    Log.e(snap.getKey(),snap.getChildrenCount() + " - Follower");
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap: dataSnapshot.getChildren()) {
+                    Log.e(snap.getKey(),snap.getChildrenCount() + " - Follower");
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
             }
 
             @Override
@@ -364,14 +441,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }
         });
-
     }
 
-    private void LoadUserClickedRecipeGrid() {
-        Log.i(TAG, "LoadUserClickedRecipeGrid: Clicked User Method");
+    private void LoadUserClickedRecipeGrid(String userId) {
+        otherUserId = userId;
+        Log.i(TAG, "LoadUserClickedRecipeGrid: Clicked User Method for " + otherUserId);
         database = FirebaseDatabase.getInstance();
         database.getReference().child(Constants.DATABASE_ROOT_USERS_RECIPES)
-                .child(userUID).addChildEventListener(new ChildEventListener() {
+                .child(otherUserId).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 mRecipe = dataSnapshot.getValue(Recipe.class);
@@ -476,34 +553,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private boolean CheckUserLoggedIn() {
-        Bundle bundle = getArguments();
-        if(bundle!=null){
-            userUID = bundle.getString(Constants.EXTRA_USER_UID);
-            Log.i(TAG, "CheckUserLoggedIn: User Id From Bundle = " + userUID);
-            UserAvailable = true;
-            userOptions = view.findViewById(R.id.profile_linear_user_options);
-            followOptions = view.findViewById(R.id.profile_linear_follow);
-            userOptions.setVisibility(View.GONE);
-            followOptions.setVisibility(View.VISIBLE);
-            UpdateUserClickedProfile();
-            LoadUserClickedRecipeGrid();
-        }else{
-            Log.i(TAG, "CheckUserLoggedIn: CHECKING IF USER IS AVAILABLE");
-            mAuth = FirebaseAuth.getInstance();
-            mUser = mAuth.getCurrentUser();
-            if(mUser != null && mAuth != null){
-                Log.i(TAG, "CheckUserLoggedIn: User Available ..............." + mUser.getEmail());
-                mUser = mAuth.getCurrentUser();
-                UserAvailable = true;
-                LoadUserRecipePhotoGrid();
-                UpdateProfile();
-            } else {
-                UserAvailable = false;
-                Log.e(TAG, "onStart: mUser is NULL sending to login...");
-                Intent intent = new Intent(getContext(), Login.class);
-                startActivity(intent);
-            }
-        }
+
 
         return UserAvailable;
     }
@@ -513,18 +563,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         if(mFollowUserButton.isChecked()){
-            if(userUID!=null){
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(mAuth.getCurrentUser().getUid()).child(userUID).setValue(true);
+            if(otherUserId !=null){
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(getUid()).child(otherUserId).setValue(true);
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).child(getUid()).setValue(true);
             }else{
                 Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
             }
         }else {
-            if(userUID!=null){
-                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(mAuth.getCurrentUser().getUid()).child(userUID).removeValue();
+            if(otherUserId !=null){
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWERS).child(otherUserId).child(getUid()).removeValue();
+                mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING).child(getUid()).child(otherUserId).removeValue();
             }else{
                 Log.i(TAG, "FollowUser: Recipe Creator Id is null...");
             }
         }
+    }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
 

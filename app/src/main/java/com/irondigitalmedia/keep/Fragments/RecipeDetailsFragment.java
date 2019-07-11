@@ -474,10 +474,10 @@ public class RecipeDetailsFragment extends Fragment implements View.OnClickListe
         bundle.putString(Constants.EXTRA_USER_UID,mRecipeCreatorId);
         pf.setArguments(bundle);
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.main_frame,pf,Constants.FRAGMENT_TAG_RECIPE_PROFILE);
-        ft.addToBackStack(null);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        ft.replace(R.id.main_frame,pf,Constants.FRAGMENT_TAG_RECIPE_PROFILE)
+                .addToBackStack(Constants.FRAGMENT_TAG_RECIPE_PROFILE)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .commit();
     }
 
 

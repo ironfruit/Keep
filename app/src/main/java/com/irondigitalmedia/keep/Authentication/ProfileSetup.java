@@ -154,8 +154,6 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
         mAddProfileImage = findViewById(R.id.profile_setup_image_add);
         mSave = findViewById(R.id.profile_setup_button_save);
         mCancel = findViewById(R.id.profile_setup_button_cancel);
-        mProgressBar = findViewById(R.id.profile_setup_progressbar);
-        mProgressBar.setVisibility(View.GONE);
     }
 
     private void SaveUserInfo() {
@@ -163,7 +161,7 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
         username = mUsername.getText().toString().trim();
         about = mAbout.getText().toString().trim();
 
-        SendInfoToTheCloud(name, user_email, username, about);
+        SendInfoToTheCloud(name, username, about);
     }
 
     private void GoToMain() {
@@ -172,25 +170,29 @@ public class ProfileSetup extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    private void SendInfoToTheCloud(final String name,final String email, final String username, final String about) {
-        SignInUserWithEmail(name,email, username, about);
+    private void SendInfoToTheCloud(final String name, final String username, final String about) {
+        SignInUserWithEmail(name, username, about);
     }
 
-    private void SignInUserWithEmail(final String name,final String email, final String username, final String about) {
+    private void SignInUserWithEmail(final String name, final String username, final String about) {
         Log.i(TAG, "SignInUserWithEmail: user email " + user_email);
-        mAuth.createUserWithEmailAndPassword(user_email, user_password)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-                        Log.i(TAG, "onSuccess: I think it's working.............." + authResult);
-                        FinishUploads(name, user_email, username, about);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(TAG, "onFailure: For some reason this shit sucks... and didn't work... " + e.getMessage());
-            }
-        });
+        if(user_password!=null){
+            mAuth.createUserWithEmailAndPassword(user_email, user_password)
+                    .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                        @Override
+                        public void onSuccess(AuthResult authResult) {
+                            Log.i(TAG, "onSuccess: I think it's working.............." + authResult);
+                            FinishUploads(name, user_email, username, about);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.i(TAG, "onFailure: For some reason this shit sucks... and didn't work... " + e.getMessage());
+                }
+            });
+        }else{
+            FinishUploads(name, user_email, username, about);
+        }
     }
 
     private void GetUserCredentials() {

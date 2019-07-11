@@ -29,6 +29,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.irondigitalmedia.keep.MainActivity;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.AuthenticationInputValidation;
+import com.irondigitalmedia.keep.Utils.Constants;
 import com.shobhitpuri.custombuttons.GoogleSignInButton;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
@@ -181,13 +182,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void GoToProfileSetup(String Email) {
+    private void GoToProfileSetup(String Email, GoogleSignInAccount acct) {
+        Log.i(TAG, "GoToProfileSetup: Google Account Info: " + acct);
         Intent intent = new Intent(Login.this,ProfileSetup.class);
-        intent.putExtra("email",Email);
+        intent.putExtra(Constants.USER_PROPERTY_EMAIL,Email);
+        intent.putExtra(Constants.GOOGLE_ACCOUNT,acct);
         startActivity(intent);
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -203,7 +206,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 if(mFBUser!=null){
                                     // Check if user's account has already been made.
                                     Log.i(TAG, "onComplete: user email is = " + mFBUser.getEmail());
-                                    GoToProfileSetup(mFBUser.getEmail());
+                                    GoToProfileSetup(mFBUser.getEmail(),acct);
                                 }else{
                                     Log.e(TAG, "onComplete: User is Null");
                                 }

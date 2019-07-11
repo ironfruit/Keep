@@ -962,6 +962,10 @@ public class EditRecipeFragment extends BaseFragment implements View.OnClickList
     public void onAttachFragment(Fragment childFragment) {
         super.onAttachFragment(childFragment);
     }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
 }
 
 
