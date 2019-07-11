@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.irondigitalmedia.keep.Fragments.RecipeDetailsFragment;
-import com.irondigitalmedia.keep.MainActivity;
+import com.irondigitalmedia.keep.Activities.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;

@@ -26,7 +26,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.irondigitalmedia.keep.MainActivity;
+import com.irondigitalmedia.keep.Activities.MainActivity;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.AuthenticationInputValidation;
 import com.irondigitalmedia.keep.Utils.Constants;

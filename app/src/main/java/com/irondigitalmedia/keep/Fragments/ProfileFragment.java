@@ -37,7 +37,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.irondigitalmedia.keep.Adapters.ProfileRecipeAdapter;
 import com.irondigitalmedia.keep.Authentication.Login;
-import com.irondigitalmedia.keep.MainActivity;
+import com.irondigitalmedia.keep.Activities.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.Model.User;
 import com.irondigitalmedia.keep.R;
@@ -99,7 +99,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Toolbar toolbar;
 
     // boolean
-    private boolean otherUserAvailable;
+    public boolean otherUserAvailable;
 
     public ProfileFragment() {}
 
@@ -116,6 +116,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         Log.e(TAG, "onCreateView: CREATE VIEW");
 
         // Create View and inflate it
@@ -190,7 +191,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 mAuth = FirebaseAuth.getInstance();
 
                 mDatabase.getReference().child(Constants.DATABASE_ROOT_FOLLOWING)
-                        .child(otherUserId).addValueEventListener(new ValueEventListener() {
+                        .child(getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.hasChild(otherUserId)){

@@ -47,7 +47,7 @@ import com.irondigitalmedia.keep.Adapters.EditIngredientAdapter;
 import com.irondigitalmedia.keep.Adapters.EditStepsAdapter;
 import com.irondigitalmedia.keep.Adapters.IngredientsAdapter;
 import com.irondigitalmedia.keep.Adapters.StepsAdapter;
-import com.irondigitalmedia.keep.MainActivity;
+import com.irondigitalmedia.keep.Activities.MainActivity;
 import com.irondigitalmedia.keep.Model.Ingredient;
 import com.irondigitalmedia.keep.Model.Instruction;
 import com.irondigitalmedia.keep.Model.Recipe;

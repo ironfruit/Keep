@@ -1,4 +1,4 @@
-package com.irondigitalmedia.keep;
+package com.irondigitalmedia.keep.Activities;
 
 import android.content.Intent;
 import androidx.annotation.NonNull;
@@ -7,10 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,6 +20,7 @@ import com.irondigitalmedia.keep.Fragments.HomeFragment;
 import com.irondigitalmedia.keep.Fragments.ProfileFragment;
 import com.irondigitalmedia.keep.Fragments.RandomRecipeFragment;
 import com.irondigitalmedia.keep.Fragments.RecipeDetailsFragment;
+import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;
 
 public class MainActivity extends BaseActivity implements FirebaseAuth.AuthStateListener, RecipeDetailsFragment.DataListener {
@@ -143,18 +141,6 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
         startActivity(intent);
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        CheckUserLoggedIn();
-        Log.i(TAG, "onResume: --------------------------");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
     @Override
     protected void onStart() {

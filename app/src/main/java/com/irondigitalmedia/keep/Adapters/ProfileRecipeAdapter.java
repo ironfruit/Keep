@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.irondigitalmedia.keep.Fragments.RecipeDetailsFragment;
-import com.irondigitalmedia.keep.MainActivity;
+import com.irondigitalmedia.keep.Activities.MainActivity;
 import com.irondigitalmedia.keep.Model.Recipe;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;

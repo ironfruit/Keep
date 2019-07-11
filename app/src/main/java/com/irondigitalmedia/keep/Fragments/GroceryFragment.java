@@ -49,7 +49,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.irondigitalmedia.keep.Adapters.GroceryAdapter;
-import com.irondigitalmedia.keep.MainActivity;
+import com.irondigitalmedia.keep.Activities.MainActivity;
 import com.irondigitalmedia.keep.Model.Grocery;
 import com.irondigitalmedia.keep.R;
 import com.irondigitalmedia.keep.Utils.Constants;

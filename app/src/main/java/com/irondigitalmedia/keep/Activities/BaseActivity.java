@@ -1,4 +1,4 @@
-package com.irondigitalmedia.keep;
+package com.irondigitalmedia.keep.Activities;
 
 import android.app.ProgressDialog;
 import android.util.Log;

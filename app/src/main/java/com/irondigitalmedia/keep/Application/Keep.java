@@ -1,4 +1,4 @@
-package com.irondigitalmedia.keep;
+package com.irondigitalmedia.keep.Application;
 
 import android.app.Application;
 
