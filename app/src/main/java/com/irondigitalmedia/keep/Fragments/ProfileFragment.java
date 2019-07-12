@@ -105,12 +105,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     public void setDataListener(String userId){
 
+        mAuth = FirebaseAuth.getInstance();
+
         otherUserId = userId;
         Log.i(TAG, "setDataListener: " + otherUserId);
-        if(otherUserId.equals(getUid())){
-            otherUserAvailable = false;
-        }else{
+        if(otherUserId!=null){
             otherUserAvailable = true;
+        }else{
+            otherUserAvailable = false;
         }
     }
 
@@ -134,10 +136,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // User is available continue operations
         InitializeViews(view);
 
-        Log.e(TAG, "onCreateView: USER ID = " + getUserId());
+        Log.e(TAG, "onCreateView: OTHER USER ID = " + getUserId());
+        Log.e(TAG, "onCreateView: LOGGED IN USER ID = " + getUid());
 
         if(otherUserAvailable){
-            LoadOtherUser();
+            if(getUserId().equals(getUid())){
+                LoadLoggedInUser();
+            }else{
+                LoadOtherUser();
+            }
         }else{
             LoadLoggedInUser();
         }
@@ -147,7 +154,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void LoadOtherUser() {
-        Log.e(TAG, "USER AVAILABLE: User Id = " + otherUserId);
         userOptions.setVisibility(View.GONE);
         followOptions.setVisibility(View.VISIBLE);
         UpdateUserClickedProfile();

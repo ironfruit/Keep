@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -38,7 +37,6 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
     private EditRecipeFragment editRecipeFragment;
     private GroceryFragment groceryFragment;
     private RandomRecipeFragment randomFragment;
-    private Fragment activeFrag;
 
     //Firebase
     private FirebaseUser mUser;
@@ -100,10 +98,10 @@ public class MainActivity extends BaseActivity implements FirebaseAuth.AuthState
                         ft2.commit();
                         return true;
                     case R.id.nav_profile:
-                            FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
-                            ft3.replace(R.id.main_frame,profileFragment,Constants.FRAGMENT_TAG_PROFILE);
-                            ft3.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                            ft3.commit();
+                        FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
+                        ft3.replace(R.id.main_frame,profileFragment,Constants.FRAGMENT_TAG_PROFILE);
+                        ft3.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        ft3.commit();
                         return true;
                     case R.id.nav_grocery:
                         FragmentTransaction ft4 = getSupportFragmentManager().beginTransaction();
